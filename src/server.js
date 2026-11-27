@@ -1,6 +1,7 @@
 const app = require('./app');
 const runTest = require('./utils/testDb');
 
+
 const PORT = process.env.PORT || 3000;
 
 // 4. ADD DEBUG LOGS

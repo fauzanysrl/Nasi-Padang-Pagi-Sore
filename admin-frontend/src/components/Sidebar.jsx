@@ -17,7 +17,8 @@ export default function Sidebar() {
 
   return (
     <div className="w-64 bg-green-800 text-white flex flex-col min-h-screen">
-      <div className="p-4 items-center justify-center flex border-b border-green-700">
+      <div className="p-4 items-center justify-center flex flex-col border-b border-green-700">
+        <img src={logo} alt="Pagi Sore Logo" className="h-[70px] object-contain mb-2 rounded-lg bg-white p-1" />
         <h1 className="text-xl font-bold tracking-wider">PAGI SORE</h1>
       </div>
       <nav className="flex-1 mt-6">

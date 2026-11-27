@@ -1,0 +1,332 @@
+{
+  "info": {
+    "name": "Nasi Padang Pagi Sore API",
+    "description": "Complete collection of API endpoints for Nasi Padang Pagi Sore, including GET, POST, PUT, and DELETE operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "dummy-token",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Dashboard (Requires Auth)",
+      "item": [
+        {
+          "name": "Get Summary",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/summary", "host": [ "{{base_url}}" ], "path": [ "dashboard", "summary" ] }
+          }
+        },
+        {
+          "name": "Get Analytics",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/analytics", "host": [ "{{base_url}}" ], "path": [ "dashboard", "analytics" ] }
+          }
+        },
+        {
+          "name": "Get Weekly",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/weekly", "host": [ "{{base_url}}" ], "path": [ "dashboard", "weekly" ] }
+          }
+        },
+        {
+          "name": "Get Recent Orders",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/recent-orders", "host": [ "{{base_url}}" ], "path": [ "dashboard", "recent-orders" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/categories", "host": [ "{{base_url}}" ], "path": [ "categories" ] } }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Makanan Utama\",\n    \"description\": \"Aneka lauk pauk padang\"\n}" },
+            "url": { "raw": "{{base_url}}/categories", "host": [ "{{base_url}}" ], "path": [ "categories" ] }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Makanan Spesial\",\n    \"description\": \"Aneka lauk pauk spesial\"\n}" },
+            "url": { "raw": "{{base_url}}/categories/1", "host": [ "{{base_url}}" ], "path": [ "categories", "1" ] }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/categories/1", "host": [ "{{base_url}}" ], "path": [ "categories", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "3. Menus",
+      "item": [
+        {
+          "name": "Get All Menus",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/menus", "host": [ "{{base_url}}" ], "path": [ "menus" ] } }
+        },
+        {
+          "name": "Get Menu By Id",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/menus/1", "host": [ "{{base_url}}" ], "path": [ "menus", "1" ] } }
+        },
+        {
+          "name": "Create Menu (Form-Data)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Rendang Daging", "type": "text" },
+                { "key": "category_id", "value": "1", "type": "text" },
+                { "key": "description", "value": "Daging sapi pilihan dengan bumbu khas padang", "type": "text" },
+                { "key": "price", "value": "25000", "type": "text" },
+                { "key": "status", "value": "available", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/menus", "host": [ "{{base_url}}" ], "path": [ "menus" ] }
+          }
+        },
+        {
+          "name": "Update Menu (Form-Data)",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Rendang Daging Spesial", "type": "text" },
+                { "key": "category_id", "value": "1", "type": "text" },
+                { "key": "price", "value": "28000", "type": "text" },
+                { "key": "status", "value": "available", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/menus/1", "host": [ "{{base_url}}" ], "path": [ "menus", "1" ] }
+          }
+        },
+        {
+          "name": "Delete Menu",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/menus/1", "host": [ "{{base_url}}" ], "path": [ "menus", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "4. Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/users", "host": [ "{{base_url}}" ], "path": [ "users" ] } }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Ahmad\",\n    \"email\": \"ahmad@gmail.com\",\n    \"password\": \"secret123\",\n    \"role\": \"cashier\"\n}" },
+            "url": { "raw": "{{base_url}}/users", "host": [ "{{base_url}}" ], "path": [ "users" ] }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Ahmad Update\",\n    \"email\": \"ahmad@gmail.com\",\n    \"role\": \"admin\"\n}" },
+            "url": { "raw": "{{base_url}}/users/1", "host": [ "{{base_url}}" ], "path": [ "users", "1" ] }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/users/1", "host": [ "{{base_url}}" ], "path": [ "users", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "5. Orders",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/orders", "host": [ "{{base_url}}" ], "path": [ "orders" ] } }
+        },
+        {
+          "name": "Get Order By Id",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/orders/1", "host": [ "{{base_url}}" ], "path": [ "orders", "1" ] } }
+        },
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"user_id\": 1,\n    \"customer_name\": \"Bapak Budi\",\n    \"table_number\": \"Meja 12\",\n    \"total_price\": 50000,\n    \"status\": \"pending\"\n}" },
+            "url": { "raw": "{{base_url}}/orders", "host": [ "{{base_url}}" ], "path": [ "orders" ] }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"status\": \"paid\"\n}" },
+            "url": { "raw": "{{base_url}}/orders/1/status", "host": [ "{{base_url}}" ], "path": [ "orders", "1", "status" ] }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/orders/1", "host": [ "{{base_url}}" ], "path": [ "orders", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "6. Order Items",
+      "item": [
+        {
+          "name": "Get All Order Items",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/order-items", "host": [ "{{base_url}}" ], "path": [ "order-items" ] } }
+        },
+        {
+          "name": "Create Order Item",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"order_id\": 1,\n    \"menu_id\": 1,\n    \"quantity\": 2,\n    \"price\": 25000\n}" },
+            "url": { "raw": "{{base_url}}/order-items", "host": [ "{{base_url}}" ], "path": [ "order-items" ] }
+          }
+        },
+        {
+          "name": "Delete Order Item",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/order-items/1", "host": [ "{{base_url}}" ], "path": [ "order-items", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "7. Customers",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/customers", "host": [ "{{base_url}}" ], "path": [ "customers" ] } }
+        },
+        {
+          "name": "Get Customer By Id",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/customers/1", "host": [ "{{base_url}}" ], "path": [ "customers", "1" ] } }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Siti Aminah\",\n    \"phone\": \"081234567890\",\n    \"email\": \"siti@example.com\",\n    \"address\": \"Jl. Sudirman No 1\"\n}" },
+            "url": { "raw": "{{base_url}}/customers", "host": [ "{{base_url}}" ], "path": [ "customers" ] }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"name\": \"Siti Aminah Update\",\n    \"phone\": \"081234567890\",\n    \"email\": \"siti.new@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/customers/1", "host": [ "{{base_url}}" ], "path": [ "customers", "1" ] }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/customers/1", "host": [ "{{base_url}}" ], "path": [ "customers", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "8. Feedbacks",
+      "item": [
+        {
+          "name": "Get All Feedbacks",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/feedbacks", "host": [ "{{base_url}}" ], "path": [ "feedbacks" ] } }
+        },
+        {
+          "name": "Get Feedback By Id",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/feedbacks/1", "host": [ "{{base_url}}" ], "path": [ "feedbacks", "1" ] } }
+        },
+        {
+          "name": "Create Feedback",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"customer_id\": 1,\n    \"order_id\": 1,\n    \"rating\": 5,\n    \"comment\": \"Masakannya sangat lezat!\"\n}" },
+            "url": { "raw": "{{base_url}}/feedbacks", "host": [ "{{base_url}}" ], "path": [ "feedbacks" ] }
+          }
+        },
+        {
+          "name": "Delete Feedback",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/feedbacks/1", "host": [ "{{base_url}}" ], "path": [ "feedbacks", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "9. Reservations",
+      "item": [
+        {
+          "name": "Get All Reservations",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/reservations", "host": [ "{{base_url}}" ], "path": [ "reservations" ] } }
+        },
+        {
+          "name": "Get Reservation By Id",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/reservations/1", "host": [ "{{base_url}}" ], "path": [ "reservations", "1" ] } }
+        },
+        {
+          "name": "Create Reservation",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"customer_name\": \"Andi\",\n    \"phone\": \"089988776655\",\n    \"reservation_time\": \"2026-05-01 19:00:00\",\n    \"table_number\": \"VIP-1\",\n    \"status\": \"pending\"\n}" },
+            "url": { "raw": "{{base_url}}/reservations", "host": [ "{{base_url}}" ], "path": [ "reservations" ] }
+          }
+        },
+        {
+          "name": "Update Reservation",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n    \"customer_name\": \"Andi Wijaya\",\n    \"phone\": \"089988776655\",\n    \"reservation_time\": \"2026-05-01 19:30:00\",\n    \"table_number\": \"VIP-1\",\n    \"status\": \"confirmed\"\n}" },
+            "url": { "raw": "{{base_url}}/reservations/1", "host": [ "{{base_url}}" ], "path": [ "reservations", "1" ] }
+          }
+        },
+        {
+          "name": "Delete Reservation",
+          "request": { "method": "DELETE", "url": { "raw": "{{base_url}}/reservations/1", "host": [ "{{base_url}}" ], "path": [ "reservations", "1" ] } }
+        }
+      ]
+    },
+    {
+      "name": "10. Tables",
+      "item": [
+        {
+          "name": "Get Table Status",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/tables/status", "host": [ "{{base_url}}" ], "path": [ "tables", "status" ] } }
+        }
+      ]
+    }
+  ]
+}

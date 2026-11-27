@@ -13,11 +13,10 @@ exports.getSummary = async (req, res) => {
       activeTables: 12
     };
 
-    console.log("Summary:", data);
-    res.json({ success: true, data });
+    res.status(200).json({ success: true, message: 'Berhasil mengambil data summary dashboard', data });
   } catch (error) {
     console.error("Summary Query Error:", error.message);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ success: false, message: 'Gagal mengambil data summary dashboard', data: null, error: error.message });
   }
 };
 
@@ -32,15 +31,13 @@ exports.getAnalytics = async (req, res) => {
     `;
     const [rows] = await db.query(query);
     
-    console.log("Analytics:", rows);
-    
     if (rows.length === 0) {
-      return res.json({ success: true, data: [], message: 'No data available for chart' });
+      return res.status(200).json({ success: true, message: 'Tidak ada data analytic', data: [] });
     }
-    res.json({ success: true, data: rows });
+    res.status(200).json({ success: true, message: 'Berhasil mengambil data analytic dashboard', data: rows });
   } catch (error) {
     console.error("Analytics Query Error:", error.message);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ success: false, message: 'Gagal mengambil data analytic dashboard', data: null, error: error.message });
   }
 };
 
@@ -53,23 +50,20 @@ exports.getWeekly = async (req, res) => {
       GROUP BY DAYNAME(created_at)
     `;
     const [rows] = await db.query(query);
-    console.log("Weekly SQL Raw:", rows);
 
-    // Normalize Mon-Sun
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const normalizedData = daysOfWeek.map(dayName => {
       const found = rows.find(r => r.day === dayName);
       return {
-        day: dayName.substring(0, 3), // e.g. "Mon"
+        day: dayName.substring(0, 3), 
         total: found ? found.total : 0
       };
     });
 
-    console.log("Weekly Normalized:", normalizedData);
-    res.json({ success: true, data: normalizedData });
+    res.status(200).json({ success: true, message: 'Berhasil mengambil data mingguan pesanan', data: normalizedData });
   } catch (error) {
     console.error("Weekly Query Error:", error.message);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ success: false, message: 'Gagal mengambil data mingguan pesanan', data: null, error: error.message });
   }
 };
 
@@ -82,14 +76,13 @@ exports.getRecentOrders = async (req, res) => {
       LIMIT 5
     `;
     const [rows] = await db.query(query);
-    console.log("Recent Orders:", rows);
     
     if (rows.length === 0) {
-      return res.json({ success: true, data: [], message: 'No recent orders' });
+      return res.status(200).json({ success: true, message: 'Tidak ada pesanan terbaru', data: [] });
     }
-    res.json({ success: true, data: rows });
+    res.status(200).json({ success: true, message: 'Berhasil mengambil pesanan terbaru', data: rows });
   } catch (error) {
     console.error("Recent Orders Query Error:", error.message);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ success: false, message: 'Gagal mengambil pesanan terbaru', data: null, error: error.message });
   }
 };

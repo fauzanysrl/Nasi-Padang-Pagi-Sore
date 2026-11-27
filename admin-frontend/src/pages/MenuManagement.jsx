@@ -7,10 +7,13 @@ export default function MenuManagement() {
   const [menus, setMenus] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(null);
   const [search, setSearch] = useState('');
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [formData, setFormData] = useState({ 
     id: null, name: '', category_id: '', description: '', price: '', status: 'available', image_url: '' 
   });
@@ -22,27 +25,35 @@ export default function MenuManagement() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setCategoriesError(null);
       const [menuRes, catRes] = await Promise.all([
-        api.get('/menus'),
-        api.get('/categories')
+        api.get('/menus').catch(e => ({ error: e })),
+        api.get('/categories').catch(e => {
+          setCategoriesError('Failed to load categories');
+          return { error: e };
+        })
       ]);
-      if (menuRes.data.success) setMenus(menuRes.data.data);
-      if (catRes.data.success) setCategories(catRes.data.data);
+      if (menuRes && menuRes.data && menuRes.data.success) setMenus(menuRes.data.data);
+      if (catRes && catRes.data && catRes.data.success) setCategories(catRes.data.data);
     } catch (err) {
       console.error(err);
+      setCategoriesError(err.message || 'Error loading data');
     } finally {
       setLoading(false);
     }
   };
 
   const handleOpenModal = (menu = null) => {
+    setImageFile(null);
     if (menu) {
       setFormData(menu);
+      setImagePreview(menu.image_url ? `http://localhost:3000${menu.image_url}` : null);
     } else {
       setFormData({ 
-        id: null, name: '', category_id: categories.length > 0 ? categories[0].id : '', 
+        id: null, name: '', category_id: '', 
         description: '', price: '', status: 'available', image_url: '' 
       });
+      setImagePreview(null);
     }
     setIsModalOpen(true);
   };
@@ -64,11 +75,32 @@ export default function MenuManagement() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!formData.category_id) {
+      alert('Please select a category');
+      return;
+    }
+    
     try {
+      // Create FormData instead of JSON
+      const submitData = new FormData();
+      submitData.append('name', formData.name);
+      submitData.append('category_id', formData.category_id);
+      submitData.append('price', formData.price);
+      submitData.append('description', formData.description || '');
+      submitData.append('status', formData.status);
+      
+      if (imageFile) {
+        submitData.append('image', imageFile);
+      }
+
       if (formData.id) {
-        await api.put(`/menus/${formData.id}`, formData);
+        await api.put(`/menus/${formData.id}`, submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
       } else {
-        await api.post('/menus', formData);
+        await api.post('/menus', submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
       }
       closeModal();
       fetchData();
@@ -139,7 +171,7 @@ export default function MenuManagement() {
             <td className="px-6 py-4">
               <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
                 {menu.image_url ? (
-                  <img src={menu.image_url} alt={menu.name} className="w-full h-full object-cover" />
+                  <img src={`http://localhost:3000${menu.image_url}`} alt={menu.name} className="w-full h-full object-cover" />
                 ) : (
                   <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -236,11 +268,16 @@ export default function MenuManagement() {
               <select 
                 required 
                 value={formData.category_id} 
-                onChange={e => setFormData({...formData, category_id: e.target.value})} 
+                onChange={e => setFormData({...formData, category_id: parseInt(e.target.value) || ''})} 
                 className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-white"
+                disabled={categories.length === 0}
               >
+                <option value="" disabled>
+                  {categoriesError ? 'Failed to load' : loading ? 'Loading categories...' : 'Select Category...'}
+                </option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
+              {categoriesError && <p className="text-xs text-red-500 mt-1">{categoriesError}</p>}
             </div>
             
             <div>
@@ -290,14 +327,38 @@ export default function MenuManagement() {
 
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-1">Image Upload</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
-                <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <p className="text-sm font-medium text-gray-600">Click to upload or drag & drop</p>
-                <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 800x400px)</p>
-              </div>
-              {/* Note: This is a UI dummy for image upload as per requirement, we keep image_url handling simple in backend or mock it */}
+              <label className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition cursor-pointer relative overflow-hidden group min-h-[160px]">
+                <input 
+                  type="file" 
+                  accept="image/jpeg, image/png, image/webp"
+                  className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+                
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-contain bg-black/5" />
+                ) : (
+                  <>
+                    <svg className="w-10 h-10 text-gray-400 mb-2 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-600">Click to upload or drag & drop</p>
+                    <p className="text-xs text-gray-400 mt-1">SVG, PNG, JPG or WEBP (max. 10MB)</p>
+                  </>
+                )}
+                
+                {imagePreview && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <p className="text-white font-medium text-sm">Click to change image</p>
+                  </div>
+                )}
+              </label>
             </div>
           </div>
         </form>

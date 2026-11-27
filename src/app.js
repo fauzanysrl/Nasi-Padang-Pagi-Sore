@@ -1,11 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const menuRoutes = require("./routes/menuRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const orderItemRoutes = require("./routes/orderItemRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
 const Menu = require("./models/Menu");
 
 const app = express();
@@ -13,6 +16,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
 
 // 7. BONUS: FRONTEND SEDERHANA
 // Route root yang merender HTML berisi data menu dinamis
@@ -53,13 +57,22 @@ app.get("/", async (req, res) => {
   }
 });
 
+const reservationRoutes = require("./routes/reservationRoutes");
+const tableRoutes = require("./routes/tableRoutes");
+const authRoutes = require("./routes/authRoutes");
+
 // Connect Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/order-items", orderItemRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/feedbacks", feedbackRoutes);
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/tables", tableRoutes);
 
 // 🔥 WAJIB: Export instance express agar bisa dibaca oleh server.js
 module.exports = app;

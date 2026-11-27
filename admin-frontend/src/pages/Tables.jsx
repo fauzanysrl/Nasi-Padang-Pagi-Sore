@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 
 export default function Tables() {
-  const [orders, setOrders] = useState([]);
+  const [occupiedTables, setOccupiedTables] = useState({});
+  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fake static tables schema (1 to 20)
@@ -14,10 +15,10 @@ export default function Tables() {
 
   const fetchData = async () => {
     try {
-      const res = await api.get('/orders');
+      const res = await api.get('/tables/status');
       if (res.data.success) {
-        // Find only orders that are pending to determine table occupancy
-        setOrders(res.data.data.filter(o => o.status === 'pending'));
+        setOccupiedTables(res.data.data.occupied || {});
+        setReservations(res.data.data.reservations || []);
       }
     } catch (err) {
       console.error(err);
@@ -51,33 +52,74 @@ export default function Tables() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {totalTables.map(tableNumber => {
           // Check if table is occupied
-          const orderOnTable = orders.find(o => parseInt(o.table_number) === tableNumber);
-          // Simulate some random reserved tables just to show the UI requirement
-          const isReserved = tableNumber === 7 || tableNumber === 15; 
+          const occupiedInfo = occupiedTables[tableNumber];
+          
+          // Check if there's a reservation for today for this table that's pending/confirmed
+          // Find the earliest upcoming reservation
+          const tableReservations = reservations.filter(r => r.table_number === tableNumber);
+          const nextReservation = tableReservations.length > 0 ? tableReservations[0] : null;
           
           let statusColor = "bg-green-100 text-green-700 border-green-200";
           let statusText = "Available";
 
-          if (orderOnTable) {
+          if (occupiedInfo) {
             statusColor = "bg-red-100 text-red-700 border-red-200";
             statusText = "Occupied";
-          } else if (isReserved) {
+          } else if (nextReservation) {
             statusColor = "bg-yellow-100 text-yellow-700 border-yellow-200";
             statusText = "Reserved";
           }
 
           return (
-            <div key={tableNumber} className={`relative p-6 rounded-2xl border-2 flex flex-col items-center justify-center transition-all hover:scale-105 cursor-pointer ${statusColor}`}>
+            <div key={tableNumber} className={`relative p-6 rounded-2xl border-2 flex flex-col items-center transition-all hover:scale-[1.02] cursor-pointer ${statusColor}`}>
               <div className="text-4xl font-black mb-2 opacity-80">#{tableNumber}</div>
-              <p className="text-xs font-bold tracking-widest uppercase">{statusText}</p>
-              {orderOnTable && (
-                <div className="mt-3 bg-white/80 rounded px-2 py-1 text-xs font-bold text-gray-800 shadow-sm">
-                  Order #{orderOnTable.id}
-                </div>
-              )}
+              <p className="text-xs font-bold tracking-widest uppercase mb-4 shadow-sm bg-white/50 px-3 py-1 rounded-full">{statusText}</p>
+              
+              <div className="w-full text-sm text-left mt-auto bg-white/60 p-3 rounded-xl min-h-[100px] flex flex-col justify-center">
+                
+                {occupiedInfo ? (
+                  <>
+                    <p className="font-bold text-gray-800 border-b border-red-200 pb-1 mb-2">
+                       <span className="text-xs font-normal text-gray-500 block">Atas Nama:</span>
+                       {occupiedInfo.customer_name} 
+                    </p>
+                    {occupiedInfo.items.length > 0 ? (
+                      <ul className="text-xs text-gray-700 space-y-1 mt-1 max-h-24 overflow-y-auto pr-1">
+                        {occupiedInfo.items.map((item, idx) => (
+                           <li key={idx} className="flex justify-between">
+                             <span className="truncate pr-2">- {item.menu_name}</span>
+                             <span className="font-semibold px-1 bg-red-100 rounded">x{item.quantity}</span>
+                           </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-gray-500 italic mt-1">Belum ada pesanan terinput.</p>
+                    )}
+                  </>
+                ) : nextReservation ? (
+                  <>
+                    <p className="font-bold text-gray-800 border-b border-yellow-200 pb-1 mb-2">
+                      <span className="text-xs font-normal text-gray-500 block">Reservasi Atas Nama:</span>
+                      {nextReservation.customer_name}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-700 mt-2 flex items-center">
+                      <svg className="w-4 h-4 mr-1 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {new Date(nextReservation.reservation_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </p>
+                    {nextReservation.phone && <p className="text-xs text-gray-500 mt-1">{nextReservation.phone}</p>}
+                  </>
+                ) : (
+                  <div className="text-center text-gray-400 opacity-60 m-auto flex flex-col items-center">
+                    <svg className="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                    <span>Meja kosong dan siap digunakan.</span>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
